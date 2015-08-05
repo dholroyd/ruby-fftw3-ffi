@@ -2,6 +2,8 @@
 
 require 'ffi'
 
+module FFTW3; end
+
 module FFTW3::Lib
   extend FFI::Library
   ffi_lib 'fftw3'
@@ -12,77 +14,61 @@ module FFTW3::Lib
     end
   end
   
-  def mangle_double(name)
-    concat(FFTW, name)
-  end
-  
-  def mangle_float(name)
-    concat(FFTWF, name)
-  end
-  
-  def mangle_long_double(name)
-    concat(FFTWL, name)
-  end
-  
-  def mangle_quad(name)
-    concat(FFTWQ, name)
-  end
-  
   FORWARD = (-1)
   
   BACKWARD = (+1)
   
   NO_TIMELIMIT = (-1.0)
   
-  MEASURE = 0U
+  MEASURE = 0
   
-  DESTROY_INPUT = (1U<<0)
+  DESTROY_INPUT = (1<<0)
   
-  UNALIGNED = (1U<<1)
+  UNALIGNED = (1<<1)
   
-  CONSERVE_MEMORY = (1U<<2)
+  CONSERVE_MEMORY = (1<<2)
   
-  EXHAUSTIVE = (1U<<3)
+  EXHAUSTIVE = (1<<3)
   
-  PRESERVE_INPUT = (1U<<4)
+  PRESERVE_INPUT = (1<<4)
   
-  PATIENT = (1U<<5)
+  PATIENT = (1<<5)
   
-  ESTIMATE = (1U<<6)
+  ESTIMATE = (1<<6)
   
-  WISDOM_ONLY = (1U<<21)
+  WISDOM_ONLY = (1<<21)
   
-  ESTIMATE_PATIENT = (1U<<7)
+  ESTIMATE_PATIENT = (1<<7)
   
-  BELIEVE_PCOST = (1U<<8)
+  BELIEVE_PCOST = (1<<8)
   
-  NO_DFT_R2HC = (1U<<9)
+  NO_DFT_R2HC = (1<<9)
   
-  NO_NONTHREADED = (1U<<10)
+  NO_NONTHREADED = (1<<10)
   
-  NO_BUFFERING = (1U<<11)
+  NO_BUFFERING = (1<<11)
   
-  NO_INDIRECT_OP = (1U<<12)
+  NO_INDIRECT_OP = (1<<12)
   
-  ALLOW_LARGE_GENERIC = (1U<<13)
+  ALLOW_LARGE_GENERIC = (1<<13)
   
-  NO_RANK_SPLITS = (1U<<14)
+  NO_RANK_SPLITS = (1<<14)
   
-  NO_VRANK_SPLITS = (1U<<15)
+  NO_VRANK_SPLITS = (1<<15)
   
-  NO_VRECURSE = (1U<<16)
+  NO_VRECURSE = (1<<16)
   
-  NO_SIMD = (1U<<17)
+  NO_SIMD = (1<<17)
   
-  NO_SLOW = (1U<<18)
+  NO_SLOW = (1<<18)
   
-  NO_FIXED_RADIX_LARGE_N = (1U<<19)
+  NO_FIXED_RADIX_LARGE_N = (1<<19)
   
-  ALLOW_PRUNING = (1U<<20)
+  ALLOW_PRUNING = (1<<20)
   
   # (Not documented)
   # 
-  # <em>This entry is only for documentation and no real method. The FFI::Enum can be accessed via #enum_type(:fftw_r2r_kind_do_not_use_me).</em>
+  # <em>This entry is only for documentation and no real method. The FFI::Enum can be accessed via #enum_type(:r2r_kind).</em>
   # 
   # === Options:
   # :r2hc ::
@@ -108,10 +94,10 @@ module FFTW3::Lib
   # :rodft11 ::
   #   
   # 
-  # @method _enum_fftw_r2r_kind_do_not_use_me_
+  # @method _enum_r2r_kind_
   # @return [Symbol]
   # @scope class
-  enum :fftw_r2r_kind_do_not_use_me, [
+  enum :r2r_kind, [
     :r2hc, 0,
     :hc2r, 1,
     :dht, 2,
@@ -134,7 +120,7 @@ module FFTW3::Lib
   #   (Integer) input stride
   # :os ::
   #   (Integer) output stride
-  class FftwIodimDoNotUseMe < FFI::Struct
+  class FftwIodim < FFI::Struct
     layout :n, :int,
            :is, :int,
            :os, :int
@@ -149,7 +135,7 @@ module FFTW3::Lib
   #   (Integer) input stride
   # :os ::
   #   (Integer) output stride
-  class FftwIodim64DoNotUseMe < FFI::Struct
+  class FftwIodim64 < FFI::Struct
     layout :n, :long,
            :is, :long,
            :os, :long
@@ -166,14 +152,14 @@ module FFTW3::Lib
   callback :fftw_write_char_func_do_not_use_me, [:pointer], :char
   
   # (Not documented)
-  class FftwPlanS < FFI::Struct
+  class FftwPlan < FFI::Struct
     layout :dummy, :char
   end
   
   # (Not documented)
   # 
   # @method fftw_execute(p)
-  # @param [Array<FftwPlanS>] p 
+  # @param [Array<FftwPlan>] p 
   # @return [nil] 
   # @scope class
   attach_function :fftw_execute, :fftw_execute, [:pointer], :void
@@ -187,9 +173,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwComplex)] out 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_dft, :fftw_plan_dft, [:int, :pointer, :pointer, :pointer, :int, :uint], FftwPlanS
+  attach_function :fftw_plan_dft, :fftw_plan_dft, [:int, :pointer, :pointer, :pointer, :int, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -199,9 +185,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwComplex)] out 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_dft_1d, :fftw_plan_dft_1d, [:int, :pointer, :pointer, :int, :uint], FftwPlanS
+  attach_function :fftw_plan_dft_1d, :fftw_plan_dft_1d, [:int, :pointer, :pointer, :int, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -212,9 +198,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwComplex)] out 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_dft_2d, :fftw_plan_dft_2d, [:int, :int, :pointer, :pointer, :int, :uint], FftwPlanS
+  attach_function :fftw_plan_dft_2d, :fftw_plan_dft_2d, [:int, :int, :pointer, :pointer, :int, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -226,9 +212,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwComplex)] out 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_dft_3d, :fftw_plan_dft_3d, [:int, :int, :int, :pointer, :pointer, :int, :uint], FftwPlanS
+  attach_function :fftw_plan_dft_3d, :fftw_plan_dft_3d, [:int, :int, :int, :pointer, :pointer, :int, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -246,9 +232,9 @@ module FFTW3::Lib
   # @param [Integer] odist 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_many_dft, :fftw_plan_many_dft, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :int, :uint], FftwPlanS
+  attach_function :fftw_plan_many_dft, :fftw_plan_many_dft, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :int, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -261,9 +247,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwComplex)] out 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_guru_dft, :fftw_plan_guru_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :int, :uint], FftwPlanS
+  attach_function :fftw_plan_guru_dft, :fftw_plan_guru_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :int, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -277,9 +263,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Double)] ro 
   # @param [FFI::Pointer(*Double)] io 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_guru_split_dft, :fftw_plan_guru_split_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_guru_split_dft, :fftw_plan_guru_split_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -292,9 +278,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwComplex)] out 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_guru64_dft, :fftw_plan_guru64_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :int, :uint], FftwPlanS
+  attach_function :fftw_plan_guru64_dft, :fftw_plan_guru64_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :int, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -308,14 +294,14 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Double)] ro 
   # @param [FFI::Pointer(*Double)] io 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_guru64_split_dft, :fftw_plan_guru64_split_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_guru64_split_dft, :fftw_plan_guru64_split_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
   # @method fftw_execute_dft(p, in_, out)
-  # @param [Array<FftwPlanS>] p 
+  # @param [Array<FftwPlan>] p 
   # @param [FFI::Pointer(*FftwComplex)] in_ 
   # @param [FFI::Pointer(*FftwComplex)] out 
   # @return [nil] 
@@ -325,7 +311,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftw_execute_split_dft(p, ri, ii, ro, io)
-  # @param [Array<FftwPlanS>] p 
+  # @param [Array<FftwPlan>] p 
   # @param [FFI::Pointer(*Double)] ri 
   # @param [FFI::Pointer(*Double)] ii 
   # @param [FFI::Pointer(*Double)] ro 
@@ -349,9 +335,9 @@ module FFTW3::Lib
   # @param [Integer] ostride 
   # @param [Integer] odist 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_many_dft_r2c, :fftw_plan_many_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :uint], FftwPlanS
+  attach_function :fftw_plan_many_dft_r2c, :fftw_plan_many_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -361,9 +347,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Double)] in_ 
   # @param [FFI::Pointer(*FftwComplex)] out 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_dft_r2c, :fftw_plan_dft_r2c, [:int, :pointer, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_dft_r2c, :fftw_plan_dft_r2c, [:int, :pointer, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -372,9 +358,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Double)] in_ 
   # @param [FFI::Pointer(*FftwComplex)] out 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_dft_r2c_1d, :fftw_plan_dft_r2c_1d, [:int, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_dft_r2c_1d, :fftw_plan_dft_r2c_1d, [:int, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -384,9 +370,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Double)] in_ 
   # @param [FFI::Pointer(*FftwComplex)] out 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_dft_r2c_2d, :fftw_plan_dft_r2c_2d, [:int, :int, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_dft_r2c_2d, :fftw_plan_dft_r2c_2d, [:int, :int, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -397,9 +383,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Double)] in_ 
   # @param [FFI::Pointer(*FftwComplex)] out 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_dft_r2c_3d, :fftw_plan_dft_r2c_3d, [:int, :int, :int, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_dft_r2c_3d, :fftw_plan_dft_r2c_3d, [:int, :int, :int, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -416,9 +402,9 @@ module FFTW3::Lib
   # @param [Integer] ostride 
   # @param [Integer] odist 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_many_dft_c2r, :fftw_plan_many_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :uint], FftwPlanS
+  attach_function :fftw_plan_many_dft_c2r, :fftw_plan_many_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -428,9 +414,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwComplex)] in_ 
   # @param [FFI::Pointer(*Double)] out 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_dft_c2r, :fftw_plan_dft_c2r, [:int, :pointer, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_dft_c2r, :fftw_plan_dft_c2r, [:int, :pointer, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -439,9 +425,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwComplex)] in_ 
   # @param [FFI::Pointer(*Double)] out 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_dft_c2r_1d, :fftw_plan_dft_c2r_1d, [:int, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_dft_c2r_1d, :fftw_plan_dft_c2r_1d, [:int, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -451,9 +437,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwComplex)] in_ 
   # @param [FFI::Pointer(*Double)] out 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_dft_c2r_2d, :fftw_plan_dft_c2r_2d, [:int, :int, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_dft_c2r_2d, :fftw_plan_dft_c2r_2d, [:int, :int, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -464,9 +450,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwComplex)] in_ 
   # @param [FFI::Pointer(*Double)] out 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_dft_c2r_3d, :fftw_plan_dft_c2r_3d, [:int, :int, :int, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_dft_c2r_3d, :fftw_plan_dft_c2r_3d, [:int, :int, :int, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -478,9 +464,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Double)] in_ 
   # @param [FFI::Pointer(*FftwComplex)] out 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_guru_dft_r2c, :fftw_plan_guru_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_guru_dft_r2c, :fftw_plan_guru_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -492,9 +478,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwComplex)] in_ 
   # @param [FFI::Pointer(*Double)] out 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_guru_dft_c2r, :fftw_plan_guru_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_guru_dft_c2r, :fftw_plan_guru_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -507,9 +493,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Double)] ro 
   # @param [FFI::Pointer(*Double)] io 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_guru_split_dft_r2c, :fftw_plan_guru_split_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_guru_split_dft_r2c, :fftw_plan_guru_split_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -522,9 +508,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Double)] ii 
   # @param [FFI::Pointer(*Double)] out 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_guru_split_dft_c2r, :fftw_plan_guru_split_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_guru_split_dft_c2r, :fftw_plan_guru_split_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -536,9 +522,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Double)] in_ 
   # @param [FFI::Pointer(*FftwComplex)] out 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_guru64_dft_r2c, :fftw_plan_guru64_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_guru64_dft_r2c, :fftw_plan_guru64_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -550,9 +536,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwComplex)] in_ 
   # @param [FFI::Pointer(*Double)] out 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_guru64_dft_c2r, :fftw_plan_guru64_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_guru64_dft_c2r, :fftw_plan_guru64_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -565,9 +551,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Double)] ro 
   # @param [FFI::Pointer(*Double)] io 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_guru64_split_dft_r2c, :fftw_plan_guru64_split_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_guru64_split_dft_r2c, :fftw_plan_guru64_split_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -580,14 +566,14 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Double)] ii 
   # @param [FFI::Pointer(*Double)] out 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_guru64_split_dft_c2r, :fftw_plan_guru64_split_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_guru64_split_dft_c2r, :fftw_plan_guru64_split_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
   # @method fftw_execute_dft_r2c(p, in_, out)
-  # @param [Array<FftwPlanS>] p 
+  # @param [Array<FftwPlan>] p 
   # @param [FFI::Pointer(*Double)] in_ 
   # @param [FFI::Pointer(*FftwComplex)] out 
   # @return [nil] 
@@ -597,7 +583,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftw_execute_dft_c2r(p, in_, out)
-  # @param [Array<FftwPlanS>] p 
+  # @param [Array<FftwPlan>] p 
   # @param [FFI::Pointer(*FftwComplex)] in_ 
   # @param [FFI::Pointer(*Double)] out 
   # @return [nil] 
@@ -607,7 +593,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftw_execute_split_dft_r2c(p, in_, ro, io)
-  # @param [Array<FftwPlanS>] p 
+  # @param [Array<FftwPlan>] p 
   # @param [FFI::Pointer(*Double)] in_ 
   # @param [FFI::Pointer(*Double)] ro 
   # @param [FFI::Pointer(*Double)] io 
@@ -618,7 +604,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftw_execute_split_dft_c2r(p, ri, ii, out)
-  # @param [Array<FftwPlanS>] p 
+  # @param [Array<FftwPlan>] p 
   # @param [FFI::Pointer(*Double)] ri 
   # @param [FFI::Pointer(*Double)] ii 
   # @param [FFI::Pointer(*Double)] out 
@@ -642,9 +628,9 @@ module FFTW3::Lib
   # @param [Integer] odist 
   # @param [Array<unknown>] kind 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_many_r2r, :fftw_plan_many_r2r, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_many_r2r, :fftw_plan_many_r2r, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -655,9 +641,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Double)] out 
   # @param [Array<unknown>] kind 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_r2r, :fftw_plan_r2r, [:int, :pointer, :pointer, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_r2r, :fftw_plan_r2r, [:int, :pointer, :pointer, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -665,11 +651,11 @@ module FFTW3::Lib
   # @param [Integer] n 
   # @param [FFI::Pointer(*Double)] in_ 
   # @param [FFI::Pointer(*Double)] out 
-  # @param [Symbol from _enum_fftw_r2r_kind_do_not_use_me_] kind 
+  # @param [Symbol from _enum_r2r_kind_] kind 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_r2r_1d, :fftw_plan_r2r_1d, [:int, :pointer, :pointer, :fftw_r2r_kind_do_not_use_me, :uint], FftwPlanS
+  attach_function :fftw_plan_r2r_1d, :fftw_plan_r2r_1d, [:int, :pointer, :pointer, :r2r_kind, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -678,12 +664,12 @@ module FFTW3::Lib
   # @param [Integer] n1 
   # @param [FFI::Pointer(*Double)] in_ 
   # @param [FFI::Pointer(*Double)] out 
-  # @param [Symbol from _enum_fftw_r2r_kind_do_not_use_me_] kind0 
-  # @param [Symbol from _enum_fftw_r2r_kind_do_not_use_me_] kind1 
+  # @param [Symbol from _enum_r2r_kind_] kind0 
+  # @param [Symbol from _enum_r2r_kind_] kind1 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_r2r_2d, :fftw_plan_r2r_2d, [:int, :int, :pointer, :pointer, :fftw_r2r_kind_do_not_use_me, :fftw_r2r_kind_do_not_use_me, :uint], FftwPlanS
+  attach_function :fftw_plan_r2r_2d, :fftw_plan_r2r_2d, [:int, :int, :pointer, :pointer, :r2r_kind, :r2r_kind, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -693,13 +679,13 @@ module FFTW3::Lib
   # @param [Integer] n2 
   # @param [FFI::Pointer(*Double)] in_ 
   # @param [FFI::Pointer(*Double)] out 
-  # @param [Symbol from _enum_fftw_r2r_kind_do_not_use_me_] kind0 
-  # @param [Symbol from _enum_fftw_r2r_kind_do_not_use_me_] kind1 
-  # @param [Symbol from _enum_fftw_r2r_kind_do_not_use_me_] kind2 
+  # @param [Symbol from _enum_r2r_kind_] kind0 
+  # @param [Symbol from _enum_r2r_kind_] kind1 
+  # @param [Symbol from _enum_r2r_kind_] kind2 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_r2r_3d, :fftw_plan_r2r_3d, [:int, :int, :int, :pointer, :pointer, :fftw_r2r_kind_do_not_use_me, :fftw_r2r_kind_do_not_use_me, :fftw_r2r_kind_do_not_use_me, :uint], FftwPlanS
+  attach_function :fftw_plan_r2r_3d, :fftw_plan_r2r_3d, [:int, :int, :int, :pointer, :pointer, :r2r_kind, :r2r_kind, :r2r_kind, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -712,9 +698,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Double)] out 
   # @param [Array<unknown>] kind 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_guru_r2r, :fftw_plan_guru_r2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_guru_r2r, :fftw_plan_guru_r2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
@@ -727,14 +713,14 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Double)] out 
   # @param [Array<unknown>] kind 
   # @param [Integer] flags 
-  # @return [FftwPlanS] 
+  # @return [FftwPlan] 
   # @scope class
-  attach_function :fftw_plan_guru64_r2r, :fftw_plan_guru64_r2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwPlanS
+  attach_function :fftw_plan_guru64_r2r, :fftw_plan_guru64_r2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwPlan
   
   # (Not documented)
   # 
   # @method fftw_execute_r2r(p, in_, out)
-  # @param [Array<FftwPlanS>] p 
+  # @param [Array<FftwPlan>] p 
   # @param [FFI::Pointer(*Double)] in_ 
   # @param [FFI::Pointer(*Double)] out 
   # @return [nil] 
@@ -744,10 +730,10 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftw_destroy_plan(p)
-  # @param [FftwPlanS] p 
+  # @param [FftwPlan] p 
   # @return [nil] 
   # @scope class
-  attach_function :fftw_destroy_plan, :fftw_destroy_plan, [FftwPlanS], :void
+  attach_function :fftw_destroy_plan, :fftw_destroy_plan, [FftwPlan], :void
   
   # (Not documented)
   # 
@@ -868,7 +854,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftw_fprint_plan(p, output_file)
-  # @param [Array<FftwPlanS>] p 
+  # @param [Array<FftwPlan>] p 
   # @param [Array<unknown>] output_file 
   # @return [nil] 
   # @scope class
@@ -877,7 +863,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftw_print_plan(p)
-  # @param [Array<FftwPlanS>] p 
+  # @param [Array<FftwPlan>] p 
   # @return [nil] 
   # @scope class
   attach_function :fftw_print_plan, :fftw_print_plan, [:pointer], :void
@@ -885,7 +871,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftw_sprint_plan(p)
-  # @param [Array<FftwPlanS>] p 
+  # @param [Array<FftwPlan>] p 
   # @return [String] 
   # @scope class
   attach_function :fftw_sprint_plan, :fftw_sprint_plan, [:pointer], :string
@@ -925,7 +911,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftw_flops(p, add, mul, fmas)
-  # @param [Array<FftwPlanS>] p 
+  # @param [Array<FftwPlan>] p 
   # @param [Array<Float>] add 
   # @param [Array<Float>] mul 
   # @param [Array<Float>] fmas 
@@ -936,7 +922,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftw_estimate_cost(p)
-  # @param [Array<FftwPlanS>] p 
+  # @param [Array<FftwPlan>] p 
   # @return [Float] 
   # @scope class
   attach_function :fftw_estimate_cost, :fftw_estimate_cost, [:pointer], :double
@@ -944,7 +930,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftw_cost(p)
-  # @param [Array<FftwPlanS>] p 
+  # @param [Array<FftwPlan>] p 
   # @return [Float] 
   # @scope class
   attach_function :fftw_cost, :fftw_cost, [:pointer], :double
@@ -958,14 +944,14 @@ module FFTW3::Lib
   attach_function :fftw_alignment_of, :fftw_alignment_of, [:pointer], :int
   
   # (Not documented)
-  class FftwfPlanS < FFI::Struct
+  class FftwfPlan < FFI::Struct
     layout :dummy, :char
   end
   
   # (Not documented)
   # 
   # @method fftwf_execute(p)
-  # @param [Array<FftwfPlanS>] p 
+  # @param [Array<FftwfPlan>] p 
   # @return [nil] 
   # @scope class
   attach_function :fftwf_execute, :fftwf_execute, [:pointer], :void
@@ -979,9 +965,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwfComplex)] out 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_dft, :fftwf_plan_dft, [:int, :pointer, :pointer, :pointer, :int, :uint], FftwfPlanS
+  attach_function :fftwf_plan_dft, :fftwf_plan_dft, [:int, :pointer, :pointer, :pointer, :int, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -991,9 +977,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwfComplex)] out 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_dft_1d, :fftwf_plan_dft_1d, [:int, :pointer, :pointer, :int, :uint], FftwfPlanS
+  attach_function :fftwf_plan_dft_1d, :fftwf_plan_dft_1d, [:int, :pointer, :pointer, :int, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1004,9 +990,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwfComplex)] out 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_dft_2d, :fftwf_plan_dft_2d, [:int, :int, :pointer, :pointer, :int, :uint], FftwfPlanS
+  attach_function :fftwf_plan_dft_2d, :fftwf_plan_dft_2d, [:int, :int, :pointer, :pointer, :int, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1018,9 +1004,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwfComplex)] out 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_dft_3d, :fftwf_plan_dft_3d, [:int, :int, :int, :pointer, :pointer, :int, :uint], FftwfPlanS
+  attach_function :fftwf_plan_dft_3d, :fftwf_plan_dft_3d, [:int, :int, :int, :pointer, :pointer, :int, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1038,9 +1024,9 @@ module FFTW3::Lib
   # @param [Integer] odist 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_many_dft, :fftwf_plan_many_dft, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :int, :uint], FftwfPlanS
+  attach_function :fftwf_plan_many_dft, :fftwf_plan_many_dft, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :int, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1053,9 +1039,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwfComplex)] out 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_guru_dft, :fftwf_plan_guru_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :int, :uint], FftwfPlanS
+  attach_function :fftwf_plan_guru_dft, :fftwf_plan_guru_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :int, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1069,9 +1055,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Float)] ro 
   # @param [FFI::Pointer(*Float)] io 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_guru_split_dft, :fftwf_plan_guru_split_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_guru_split_dft, :fftwf_plan_guru_split_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1084,9 +1070,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwfComplex)] out 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_guru64_dft, :fftwf_plan_guru64_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :int, :uint], FftwfPlanS
+  attach_function :fftwf_plan_guru64_dft, :fftwf_plan_guru64_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :int, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1100,14 +1086,14 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Float)] ro 
   # @param [FFI::Pointer(*Float)] io 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_guru64_split_dft, :fftwf_plan_guru64_split_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_guru64_split_dft, :fftwf_plan_guru64_split_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
   # @method fftwf_execute_dft(p, in_, out)
-  # @param [Array<FftwfPlanS>] p 
+  # @param [Array<FftwfPlan>] p 
   # @param [FFI::Pointer(*FftwfComplex)] in_ 
   # @param [FFI::Pointer(*FftwfComplex)] out 
   # @return [nil] 
@@ -1117,7 +1103,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwf_execute_split_dft(p, ri, ii, ro, io)
-  # @param [Array<FftwfPlanS>] p 
+  # @param [Array<FftwfPlan>] p 
   # @param [FFI::Pointer(*Float)] ri 
   # @param [FFI::Pointer(*Float)] ii 
   # @param [FFI::Pointer(*Float)] ro 
@@ -1141,9 +1127,9 @@ module FFTW3::Lib
   # @param [Integer] ostride 
   # @param [Integer] odist 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_many_dft_r2c, :fftwf_plan_many_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :uint], FftwfPlanS
+  attach_function :fftwf_plan_many_dft_r2c, :fftwf_plan_many_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1153,9 +1139,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Float)] in_ 
   # @param [FFI::Pointer(*FftwfComplex)] out 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_dft_r2c, :fftwf_plan_dft_r2c, [:int, :pointer, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_dft_r2c, :fftwf_plan_dft_r2c, [:int, :pointer, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1164,9 +1150,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Float)] in_ 
   # @param [FFI::Pointer(*FftwfComplex)] out 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_dft_r2c_1d, :fftwf_plan_dft_r2c_1d, [:int, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_dft_r2c_1d, :fftwf_plan_dft_r2c_1d, [:int, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1176,9 +1162,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Float)] in_ 
   # @param [FFI::Pointer(*FftwfComplex)] out 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_dft_r2c_2d, :fftwf_plan_dft_r2c_2d, [:int, :int, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_dft_r2c_2d, :fftwf_plan_dft_r2c_2d, [:int, :int, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1189,9 +1175,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Float)] in_ 
   # @param [FFI::Pointer(*FftwfComplex)] out 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_dft_r2c_3d, :fftwf_plan_dft_r2c_3d, [:int, :int, :int, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_dft_r2c_3d, :fftwf_plan_dft_r2c_3d, [:int, :int, :int, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1208,9 +1194,9 @@ module FFTW3::Lib
   # @param [Integer] ostride 
   # @param [Integer] odist 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_many_dft_c2r, :fftwf_plan_many_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :uint], FftwfPlanS
+  attach_function :fftwf_plan_many_dft_c2r, :fftwf_plan_many_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1220,9 +1206,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwfComplex)] in_ 
   # @param [FFI::Pointer(*Float)] out 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_dft_c2r, :fftwf_plan_dft_c2r, [:int, :pointer, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_dft_c2r, :fftwf_plan_dft_c2r, [:int, :pointer, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1231,9 +1217,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwfComplex)] in_ 
   # @param [FFI::Pointer(*Float)] out 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_dft_c2r_1d, :fftwf_plan_dft_c2r_1d, [:int, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_dft_c2r_1d, :fftwf_plan_dft_c2r_1d, [:int, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1243,9 +1229,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwfComplex)] in_ 
   # @param [FFI::Pointer(*Float)] out 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_dft_c2r_2d, :fftwf_plan_dft_c2r_2d, [:int, :int, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_dft_c2r_2d, :fftwf_plan_dft_c2r_2d, [:int, :int, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1256,9 +1242,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwfComplex)] in_ 
   # @param [FFI::Pointer(*Float)] out 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_dft_c2r_3d, :fftwf_plan_dft_c2r_3d, [:int, :int, :int, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_dft_c2r_3d, :fftwf_plan_dft_c2r_3d, [:int, :int, :int, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1270,9 +1256,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Float)] in_ 
   # @param [FFI::Pointer(*FftwfComplex)] out 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_guru_dft_r2c, :fftwf_plan_guru_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_guru_dft_r2c, :fftwf_plan_guru_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1284,9 +1270,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwfComplex)] in_ 
   # @param [FFI::Pointer(*Float)] out 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_guru_dft_c2r, :fftwf_plan_guru_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_guru_dft_c2r, :fftwf_plan_guru_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1299,9 +1285,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Float)] ro 
   # @param [FFI::Pointer(*Float)] io 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_guru_split_dft_r2c, :fftwf_plan_guru_split_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_guru_split_dft_r2c, :fftwf_plan_guru_split_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1314,9 +1300,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Float)] ii 
   # @param [FFI::Pointer(*Float)] out 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_guru_split_dft_c2r, :fftwf_plan_guru_split_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_guru_split_dft_c2r, :fftwf_plan_guru_split_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1328,9 +1314,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Float)] in_ 
   # @param [FFI::Pointer(*FftwfComplex)] out 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_guru64_dft_r2c, :fftwf_plan_guru64_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_guru64_dft_r2c, :fftwf_plan_guru64_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1342,9 +1328,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwfComplex)] in_ 
   # @param [FFI::Pointer(*Float)] out 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_guru64_dft_c2r, :fftwf_plan_guru64_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_guru64_dft_c2r, :fftwf_plan_guru64_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1357,9 +1343,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Float)] ro 
   # @param [FFI::Pointer(*Float)] io 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_guru64_split_dft_r2c, :fftwf_plan_guru64_split_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_guru64_split_dft_r2c, :fftwf_plan_guru64_split_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1372,14 +1358,14 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Float)] ii 
   # @param [FFI::Pointer(*Float)] out 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_guru64_split_dft_c2r, :fftwf_plan_guru64_split_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_guru64_split_dft_c2r, :fftwf_plan_guru64_split_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
   # @method fftwf_execute_dft_r2c(p, in_, out)
-  # @param [Array<FftwfPlanS>] p 
+  # @param [Array<FftwfPlan>] p 
   # @param [FFI::Pointer(*Float)] in_ 
   # @param [FFI::Pointer(*FftwfComplex)] out 
   # @return [nil] 
@@ -1389,7 +1375,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwf_execute_dft_c2r(p, in_, out)
-  # @param [Array<FftwfPlanS>] p 
+  # @param [Array<FftwfPlan>] p 
   # @param [FFI::Pointer(*FftwfComplex)] in_ 
   # @param [FFI::Pointer(*Float)] out 
   # @return [nil] 
@@ -1399,7 +1385,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwf_execute_split_dft_r2c(p, in_, ro, io)
-  # @param [Array<FftwfPlanS>] p 
+  # @param [Array<FftwfPlan>] p 
   # @param [FFI::Pointer(*Float)] in_ 
   # @param [FFI::Pointer(*Float)] ro 
   # @param [FFI::Pointer(*Float)] io 
@@ -1410,7 +1396,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwf_execute_split_dft_c2r(p, ri, ii, out)
-  # @param [Array<FftwfPlanS>] p 
+  # @param [Array<FftwfPlan>] p 
   # @param [FFI::Pointer(*Float)] ri 
   # @param [FFI::Pointer(*Float)] ii 
   # @param [FFI::Pointer(*Float)] out 
@@ -1434,9 +1420,9 @@ module FFTW3::Lib
   # @param [Integer] odist 
   # @param [Array<unknown>] kind 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_many_r2r, :fftwf_plan_many_r2r, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_many_r2r, :fftwf_plan_many_r2r, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1447,9 +1433,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Float)] out 
   # @param [Array<unknown>] kind 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_r2r, :fftwf_plan_r2r, [:int, :pointer, :pointer, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_r2r, :fftwf_plan_r2r, [:int, :pointer, :pointer, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1457,11 +1443,11 @@ module FFTW3::Lib
   # @param [Integer] n 
   # @param [FFI::Pointer(*Float)] in_ 
   # @param [FFI::Pointer(*Float)] out 
-  # @param [Symbol from _enum_fftw_r2r_kind_do_not_use_me_] kind 
+  # @param [Symbol from _enum_r2r_kind_] kind 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_r2r_1d, :fftwf_plan_r2r_1d, [:int, :pointer, :pointer, :fftw_r2r_kind_do_not_use_me, :uint], FftwfPlanS
+  attach_function :fftwf_plan_r2r_1d, :fftwf_plan_r2r_1d, [:int, :pointer, :pointer, :r2r_kind, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1470,12 +1456,12 @@ module FFTW3::Lib
   # @param [Integer] n1 
   # @param [FFI::Pointer(*Float)] in_ 
   # @param [FFI::Pointer(*Float)] out 
-  # @param [Symbol from _enum_fftw_r2r_kind_do_not_use_me_] kind0 
-  # @param [Symbol from _enum_fftw_r2r_kind_do_not_use_me_] kind1 
+  # @param [Symbol from _enum_r2r_kind_] kind0 
+  # @param [Symbol from _enum_r2r_kind_] kind1 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_r2r_2d, :fftwf_plan_r2r_2d, [:int, :int, :pointer, :pointer, :fftw_r2r_kind_do_not_use_me, :fftw_r2r_kind_do_not_use_me, :uint], FftwfPlanS
+  attach_function :fftwf_plan_r2r_2d, :fftwf_plan_r2r_2d, [:int, :int, :pointer, :pointer, :r2r_kind, :r2r_kind, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1485,13 +1471,13 @@ module FFTW3::Lib
   # @param [Integer] n2 
   # @param [FFI::Pointer(*Float)] in_ 
   # @param [FFI::Pointer(*Float)] out 
-  # @param [Symbol from _enum_fftw_r2r_kind_do_not_use_me_] kind0 
-  # @param [Symbol from _enum_fftw_r2r_kind_do_not_use_me_] kind1 
-  # @param [Symbol from _enum_fftw_r2r_kind_do_not_use_me_] kind2 
+  # @param [Symbol from _enum_r2r_kind_] kind0 
+  # @param [Symbol from _enum_r2r_kind_] kind1 
+  # @param [Symbol from _enum_r2r_kind_] kind2 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_r2r_3d, :fftwf_plan_r2r_3d, [:int, :int, :int, :pointer, :pointer, :fftw_r2r_kind_do_not_use_me, :fftw_r2r_kind_do_not_use_me, :fftw_r2r_kind_do_not_use_me, :uint], FftwfPlanS
+  attach_function :fftwf_plan_r2r_3d, :fftwf_plan_r2r_3d, [:int, :int, :int, :pointer, :pointer, :r2r_kind, :r2r_kind, :r2r_kind, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1504,9 +1490,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Float)] out 
   # @param [Array<unknown>] kind 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_guru_r2r, :fftwf_plan_guru_r2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_guru_r2r, :fftwf_plan_guru_r2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
@@ -1519,14 +1505,14 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*Float)] out 
   # @param [Array<unknown>] kind 
   # @param [Integer] flags 
-  # @return [FftwfPlanS] 
+  # @return [FftwfPlan] 
   # @scope class
-  attach_function :fftwf_plan_guru64_r2r, :fftwf_plan_guru64_r2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwfPlanS
+  attach_function :fftwf_plan_guru64_r2r, :fftwf_plan_guru64_r2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwfPlan
   
   # (Not documented)
   # 
   # @method fftwf_execute_r2r(p, in_, out)
-  # @param [Array<FftwfPlanS>] p 
+  # @param [Array<FftwfPlan>] p 
   # @param [FFI::Pointer(*Float)] in_ 
   # @param [FFI::Pointer(*Float)] out 
   # @return [nil] 
@@ -1536,10 +1522,10 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwf_destroy_plan(p)
-  # @param [FftwfPlanS] p 
+  # @param [FftwfPlan] p 
   # @return [nil] 
   # @scope class
-  attach_function :fftwf_destroy_plan, :fftwf_destroy_plan, [FftwfPlanS], :void
+  attach_function :fftwf_destroy_plan, :fftwf_destroy_plan, [FftwfPlan], :void
   
   # (Not documented)
   # 
@@ -1660,7 +1646,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwf_fprint_plan(p, output_file)
-  # @param [Array<FftwfPlanS>] p 
+  # @param [Array<FftwfPlan>] p 
   # @param [Array<unknown>] output_file 
   # @return [nil] 
   # @scope class
@@ -1669,7 +1655,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwf_print_plan(p)
-  # @param [Array<FftwfPlanS>] p 
+  # @param [Array<FftwfPlan>] p 
   # @return [nil] 
   # @scope class
   attach_function :fftwf_print_plan, :fftwf_print_plan, [:pointer], :void
@@ -1677,7 +1663,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwf_sprint_plan(p)
-  # @param [Array<FftwfPlanS>] p 
+  # @param [Array<FftwfPlan>] p 
   # @return [String] 
   # @scope class
   attach_function :fftwf_sprint_plan, :fftwf_sprint_plan, [:pointer], :string
@@ -1717,7 +1703,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwf_flops(p, add, mul, fmas)
-  # @param [Array<FftwfPlanS>] p 
+  # @param [Array<FftwfPlan>] p 
   # @param [Array<Float>] add 
   # @param [Array<Float>] mul 
   # @param [Array<Float>] fmas 
@@ -1728,7 +1714,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwf_estimate_cost(p)
-  # @param [Array<FftwfPlanS>] p 
+  # @param [Array<FftwfPlan>] p 
   # @return [Float] 
   # @scope class
   attach_function :fftwf_estimate_cost, :fftwf_estimate_cost, [:pointer], :double
@@ -1736,7 +1722,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwf_cost(p)
-  # @param [Array<FftwfPlanS>] p 
+  # @param [Array<FftwfPlan>] p 
   # @return [Float] 
   # @scope class
   attach_function :fftwf_cost, :fftwf_cost, [:pointer], :double
@@ -1750,14 +1736,14 @@ module FFTW3::Lib
   attach_function :fftwf_alignment_of, :fftwf_alignment_of, [:pointer], :int
   
   # (Not documented)
-  class FftwlPlanS < FFI::Struct
+  class FftwlPlan < FFI::Struct
     layout :dummy, :char
   end
   
   # (Not documented)
   # 
   # @method fftwl_execute(p)
-  # @param [Array<FftwlPlanS>] p 
+  # @param [Array<FftwlPlan>] p 
   # @return [nil] 
   # @scope class
   attach_function :fftwl_execute, :fftwl_execute, [:pointer], :void
@@ -1771,9 +1757,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwlComplex)] out 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_dft, :fftwl_plan_dft, [:int, :pointer, :pointer, :pointer, :int, :uint], FftwlPlanS
+  attach_function :fftwl_plan_dft, :fftwl_plan_dft, [:int, :pointer, :pointer, :pointer, :int, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -1783,9 +1769,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwlComplex)] out 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_dft_1d, :fftwl_plan_dft_1d, [:int, :pointer, :pointer, :int, :uint], FftwlPlanS
+  attach_function :fftwl_plan_dft_1d, :fftwl_plan_dft_1d, [:int, :pointer, :pointer, :int, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -1796,9 +1782,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwlComplex)] out 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_dft_2d, :fftwl_plan_dft_2d, [:int, :int, :pointer, :pointer, :int, :uint], FftwlPlanS
+  attach_function :fftwl_plan_dft_2d, :fftwl_plan_dft_2d, [:int, :int, :pointer, :pointer, :int, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -1810,9 +1796,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwlComplex)] out 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_dft_3d, :fftwl_plan_dft_3d, [:int, :int, :int, :pointer, :pointer, :int, :uint], FftwlPlanS
+  attach_function :fftwl_plan_dft_3d, :fftwl_plan_dft_3d, [:int, :int, :int, :pointer, :pointer, :int, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -1830,9 +1816,9 @@ module FFTW3::Lib
   # @param [Integer] odist 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_many_dft, :fftwl_plan_many_dft, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :int, :uint], FftwlPlanS
+  attach_function :fftwl_plan_many_dft, :fftwl_plan_many_dft, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :int, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -1845,9 +1831,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwlComplex)] out 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_guru_dft, :fftwl_plan_guru_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :int, :uint], FftwlPlanS
+  attach_function :fftwl_plan_guru_dft, :fftwl_plan_guru_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :int, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -1861,9 +1847,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*LongDouble)] ro 
   # @param [FFI::Pointer(*LongDouble)] io 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_guru_split_dft, :fftwl_plan_guru_split_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_guru_split_dft, :fftwl_plan_guru_split_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -1876,9 +1862,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwlComplex)] out 
   # @param [Integer] sign 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_guru64_dft, :fftwl_plan_guru64_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :int, :uint], FftwlPlanS
+  attach_function :fftwl_plan_guru64_dft, :fftwl_plan_guru64_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :int, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -1892,14 +1878,14 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*LongDouble)] ro 
   # @param [FFI::Pointer(*LongDouble)] io 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_guru64_split_dft, :fftwl_plan_guru64_split_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_guru64_split_dft, :fftwl_plan_guru64_split_dft, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
   # @method fftwl_execute_dft(p, in_, out)
-  # @param [Array<FftwlPlanS>] p 
+  # @param [Array<FftwlPlan>] p 
   # @param [FFI::Pointer(*FftwlComplex)] in_ 
   # @param [FFI::Pointer(*FftwlComplex)] out 
   # @return [nil] 
@@ -1909,7 +1895,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwl_execute_split_dft(p, ri, ii, ro, io)
-  # @param [Array<FftwlPlanS>] p 
+  # @param [Array<FftwlPlan>] p 
   # @param [FFI::Pointer(*LongDouble)] ri 
   # @param [FFI::Pointer(*LongDouble)] ii 
   # @param [FFI::Pointer(*LongDouble)] ro 
@@ -1933,9 +1919,9 @@ module FFTW3::Lib
   # @param [Integer] ostride 
   # @param [Integer] odist 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_many_dft_r2c, :fftwl_plan_many_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :uint], FftwlPlanS
+  attach_function :fftwl_plan_many_dft_r2c, :fftwl_plan_many_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -1945,9 +1931,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*LongDouble)] in_ 
   # @param [FFI::Pointer(*FftwlComplex)] out 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_dft_r2c, :fftwl_plan_dft_r2c, [:int, :pointer, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_dft_r2c, :fftwl_plan_dft_r2c, [:int, :pointer, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -1956,9 +1942,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*LongDouble)] in_ 
   # @param [FFI::Pointer(*FftwlComplex)] out 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_dft_r2c_1d, :fftwl_plan_dft_r2c_1d, [:int, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_dft_r2c_1d, :fftwl_plan_dft_r2c_1d, [:int, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -1968,9 +1954,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*LongDouble)] in_ 
   # @param [FFI::Pointer(*FftwlComplex)] out 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_dft_r2c_2d, :fftwl_plan_dft_r2c_2d, [:int, :int, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_dft_r2c_2d, :fftwl_plan_dft_r2c_2d, [:int, :int, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -1981,9 +1967,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*LongDouble)] in_ 
   # @param [FFI::Pointer(*FftwlComplex)] out 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_dft_r2c_3d, :fftwl_plan_dft_r2c_3d, [:int, :int, :int, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_dft_r2c_3d, :fftwl_plan_dft_r2c_3d, [:int, :int, :int, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2000,9 +1986,9 @@ module FFTW3::Lib
   # @param [Integer] ostride 
   # @param [Integer] odist 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_many_dft_c2r, :fftwl_plan_many_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :uint], FftwlPlanS
+  attach_function :fftwl_plan_many_dft_c2r, :fftwl_plan_many_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2012,9 +1998,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwlComplex)] in_ 
   # @param [FFI::Pointer(*LongDouble)] out 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_dft_c2r, :fftwl_plan_dft_c2r, [:int, :pointer, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_dft_c2r, :fftwl_plan_dft_c2r, [:int, :pointer, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2023,9 +2009,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwlComplex)] in_ 
   # @param [FFI::Pointer(*LongDouble)] out 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_dft_c2r_1d, :fftwl_plan_dft_c2r_1d, [:int, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_dft_c2r_1d, :fftwl_plan_dft_c2r_1d, [:int, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2035,9 +2021,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwlComplex)] in_ 
   # @param [FFI::Pointer(*LongDouble)] out 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_dft_c2r_2d, :fftwl_plan_dft_c2r_2d, [:int, :int, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_dft_c2r_2d, :fftwl_plan_dft_c2r_2d, [:int, :int, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2048,9 +2034,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwlComplex)] in_ 
   # @param [FFI::Pointer(*LongDouble)] out 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_dft_c2r_3d, :fftwl_plan_dft_c2r_3d, [:int, :int, :int, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_dft_c2r_3d, :fftwl_plan_dft_c2r_3d, [:int, :int, :int, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2062,9 +2048,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*LongDouble)] in_ 
   # @param [FFI::Pointer(*FftwlComplex)] out 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_guru_dft_r2c, :fftwl_plan_guru_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_guru_dft_r2c, :fftwl_plan_guru_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2076,9 +2062,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwlComplex)] in_ 
   # @param [FFI::Pointer(*LongDouble)] out 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_guru_dft_c2r, :fftwl_plan_guru_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_guru_dft_c2r, :fftwl_plan_guru_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2091,9 +2077,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*LongDouble)] ro 
   # @param [FFI::Pointer(*LongDouble)] io 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_guru_split_dft_r2c, :fftwl_plan_guru_split_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_guru_split_dft_r2c, :fftwl_plan_guru_split_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2106,9 +2092,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*LongDouble)] ii 
   # @param [FFI::Pointer(*LongDouble)] out 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_guru_split_dft_c2r, :fftwl_plan_guru_split_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_guru_split_dft_c2r, :fftwl_plan_guru_split_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2120,9 +2106,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*LongDouble)] in_ 
   # @param [FFI::Pointer(*FftwlComplex)] out 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_guru64_dft_r2c, :fftwl_plan_guru64_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_guru64_dft_r2c, :fftwl_plan_guru64_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2134,9 +2120,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*FftwlComplex)] in_ 
   # @param [FFI::Pointer(*LongDouble)] out 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_guru64_dft_c2r, :fftwl_plan_guru64_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_guru64_dft_c2r, :fftwl_plan_guru64_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2149,9 +2135,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*LongDouble)] ro 
   # @param [FFI::Pointer(*LongDouble)] io 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_guru64_split_dft_r2c, :fftwl_plan_guru64_split_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_guru64_split_dft_r2c, :fftwl_plan_guru64_split_dft_r2c, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2164,14 +2150,14 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*LongDouble)] ii 
   # @param [FFI::Pointer(*LongDouble)] out 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_guru64_split_dft_c2r, :fftwl_plan_guru64_split_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_guru64_split_dft_c2r, :fftwl_plan_guru64_split_dft_c2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
   # @method fftwl_execute_dft_r2c(p, in_, out)
-  # @param [Array<FftwlPlanS>] p 
+  # @param [Array<FftwlPlan>] p 
   # @param [FFI::Pointer(*LongDouble)] in_ 
   # @param [FFI::Pointer(*FftwlComplex)] out 
   # @return [nil] 
@@ -2181,7 +2167,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwl_execute_dft_c2r(p, in_, out)
-  # @param [Array<FftwlPlanS>] p 
+  # @param [Array<FftwlPlan>] p 
   # @param [FFI::Pointer(*FftwlComplex)] in_ 
   # @param [FFI::Pointer(*LongDouble)] out 
   # @return [nil] 
@@ -2191,7 +2177,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwl_execute_split_dft_r2c(p, in_, ro, io)
-  # @param [Array<FftwlPlanS>] p 
+  # @param [Array<FftwlPlan>] p 
   # @param [FFI::Pointer(*LongDouble)] in_ 
   # @param [FFI::Pointer(*LongDouble)] ro 
   # @param [FFI::Pointer(*LongDouble)] io 
@@ -2202,7 +2188,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwl_execute_split_dft_c2r(p, ri, ii, out)
-  # @param [Array<FftwlPlanS>] p 
+  # @param [Array<FftwlPlan>] p 
   # @param [FFI::Pointer(*LongDouble)] ri 
   # @param [FFI::Pointer(*LongDouble)] ii 
   # @param [FFI::Pointer(*LongDouble)] out 
@@ -2226,9 +2212,9 @@ module FFTW3::Lib
   # @param [Integer] odist 
   # @param [Array<unknown>] kind 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_many_r2r, :fftwl_plan_many_r2r, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_many_r2r, :fftwl_plan_many_r2r, [:int, :pointer, :int, :pointer, :pointer, :int, :int, :pointer, :pointer, :int, :int, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2239,9 +2225,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*LongDouble)] out 
   # @param [Array<unknown>] kind 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_r2r, :fftwl_plan_r2r, [:int, :pointer, :pointer, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_r2r, :fftwl_plan_r2r, [:int, :pointer, :pointer, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2249,11 +2235,11 @@ module FFTW3::Lib
   # @param [Integer] n 
   # @param [FFI::Pointer(*LongDouble)] in_ 
   # @param [FFI::Pointer(*LongDouble)] out 
-  # @param [Symbol from _enum_fftw_r2r_kind_do_not_use_me_] kind 
+  # @param [Symbol from _enum_r2r_kind_] kind 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_r2r_1d, :fftwl_plan_r2r_1d, [:int, :pointer, :pointer, :fftw_r2r_kind_do_not_use_me, :uint], FftwlPlanS
+  attach_function :fftwl_plan_r2r_1d, :fftwl_plan_r2r_1d, [:int, :pointer, :pointer, :r2r_kind, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2262,12 +2248,12 @@ module FFTW3::Lib
   # @param [Integer] n1 
   # @param [FFI::Pointer(*LongDouble)] in_ 
   # @param [FFI::Pointer(*LongDouble)] out 
-  # @param [Symbol from _enum_fftw_r2r_kind_do_not_use_me_] kind0 
-  # @param [Symbol from _enum_fftw_r2r_kind_do_not_use_me_] kind1 
+  # @param [Symbol from _enum_r2r_kind_] kind0 
+  # @param [Symbol from _enum_r2r_kind_] kind1 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_r2r_2d, :fftwl_plan_r2r_2d, [:int, :int, :pointer, :pointer, :fftw_r2r_kind_do_not_use_me, :fftw_r2r_kind_do_not_use_me, :uint], FftwlPlanS
+  attach_function :fftwl_plan_r2r_2d, :fftwl_plan_r2r_2d, [:int, :int, :pointer, :pointer, :r2r_kind, :r2r_kind, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2277,13 +2263,13 @@ module FFTW3::Lib
   # @param [Integer] n2 
   # @param [FFI::Pointer(*LongDouble)] in_ 
   # @param [FFI::Pointer(*LongDouble)] out 
-  # @param [Symbol from _enum_fftw_r2r_kind_do_not_use_me_] kind0 
-  # @param [Symbol from _enum_fftw_r2r_kind_do_not_use_me_] kind1 
-  # @param [Symbol from _enum_fftw_r2r_kind_do_not_use_me_] kind2 
+  # @param [Symbol from _enum_r2r_kind_] kind0 
+  # @param [Symbol from _enum_r2r_kind_] kind1 
+  # @param [Symbol from _enum_r2r_kind_] kind2 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_r2r_3d, :fftwl_plan_r2r_3d, [:int, :int, :int, :pointer, :pointer, :fftw_r2r_kind_do_not_use_me, :fftw_r2r_kind_do_not_use_me, :fftw_r2r_kind_do_not_use_me, :uint], FftwlPlanS
+  attach_function :fftwl_plan_r2r_3d, :fftwl_plan_r2r_3d, [:int, :int, :int, :pointer, :pointer, :r2r_kind, :r2r_kind, :r2r_kind, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2296,9 +2282,9 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*LongDouble)] out 
   # @param [Array<unknown>] kind 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_guru_r2r, :fftwl_plan_guru_r2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_guru_r2r, :fftwl_plan_guru_r2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
@@ -2311,14 +2297,14 @@ module FFTW3::Lib
   # @param [FFI::Pointer(*LongDouble)] out 
   # @param [Array<unknown>] kind 
   # @param [Integer] flags 
-  # @return [FftwlPlanS] 
+  # @return [FftwlPlan] 
   # @scope class
-  attach_function :fftwl_plan_guru64_r2r, :fftwl_plan_guru64_r2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwlPlanS
+  attach_function :fftwl_plan_guru64_r2r, :fftwl_plan_guru64_r2r, [:int, :pointer, :int, :pointer, :pointer, :pointer, :pointer, :uint], FftwlPlan
   
   # (Not documented)
   # 
   # @method fftwl_execute_r2r(p, in_, out)
-  # @param [Array<FftwlPlanS>] p 
+  # @param [Array<FftwlPlan>] p 
   # @param [FFI::Pointer(*LongDouble)] in_ 
   # @param [FFI::Pointer(*LongDouble)] out 
   # @return [nil] 
@@ -2328,10 +2314,10 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwl_destroy_plan(p)
-  # @param [FftwlPlanS] p 
+  # @param [FftwlPlan] p 
   # @return [nil] 
   # @scope class
-  attach_function :fftwl_destroy_plan, :fftwl_destroy_plan, [FftwlPlanS], :void
+  attach_function :fftwl_destroy_plan, :fftwl_destroy_plan, [FftwlPlan], :void
   
   # (Not documented)
   # 
@@ -2452,7 +2438,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwl_fprint_plan(p, output_file)
-  # @param [Array<FftwlPlanS>] p 
+  # @param [Array<FftwlPlan>] p 
   # @param [Array<unknown>] output_file 
   # @return [nil] 
   # @scope class
@@ -2461,7 +2447,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwl_print_plan(p)
-  # @param [Array<FftwlPlanS>] p 
+  # @param [Array<FftwlPlan>] p 
   # @return [nil] 
   # @scope class
   attach_function :fftwl_print_plan, :fftwl_print_plan, [:pointer], :void
@@ -2469,7 +2455,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwl_sprint_plan(p)
-  # @param [Array<FftwlPlanS>] p 
+  # @param [Array<FftwlPlan>] p 
   # @return [String] 
   # @scope class
   attach_function :fftwl_sprint_plan, :fftwl_sprint_plan, [:pointer], :string
@@ -2509,7 +2495,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwl_flops(p, add, mul, fmas)
-  # @param [Array<FftwlPlanS>] p 
+  # @param [Array<FftwlPlan>] p 
   # @param [Array<Float>] add 
   # @param [Array<Float>] mul 
   # @param [Array<Float>] fmas 
@@ -2520,7 +2506,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwl_estimate_cost(p)
-  # @param [Array<FftwlPlanS>] p 
+  # @param [Array<FftwlPlan>] p 
   # @return [Float] 
   # @scope class
   attach_function :fftwl_estimate_cost, :fftwl_estimate_cost, [:pointer], :double
@@ -2528,7 +2514,7 @@ module FFTW3::Lib
   # (Not documented)
   # 
   # @method fftwl_cost(p)
-  # @param [Array<FftwlPlanS>] p 
+  # @param [Array<FftwlPlan>] p 
   # @return [Float] 
   # @scope class
   attach_function :fftwl_cost, :fftwl_cost, [:pointer], :double
