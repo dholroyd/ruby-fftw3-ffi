@@ -28,3 +28,8 @@ See the [FFTW documentation](http://www.fftw.org/doc/index.html) for description
     # cleanup,
     FFTW3::Lib.fftw_free(signal)
     FFTW3::Lib.fftw_destroy_plan(plan)
+
+See also
+--------
+
+ * [ruby-fftw3](http://www.gfd-dennou.org/arch/ruby/products/ruby-fftw3/) - a wrapper for libfftw3 implemented as a ruby extension - a more rubyish API, but a smaller subset of the API is exposed
